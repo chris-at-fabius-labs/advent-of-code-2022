@@ -7,6 +7,14 @@ col_count = 0
 def get_perimeter_count():
     return row_count * 2 + col_count * 2 - 4
 
+def check_past_edge(row_index, col_index):
+    return (
+        row_index < 0 or
+        row_index >= row_count or
+        col_index < 0 or
+        col_index >= col_count
+    )
+
 def check_visible_from_edge(origin_row, origin_col):
     return (
         check_direction1(origin_row, origin_col, 0, -1) or
@@ -29,12 +37,7 @@ def check_direction1(origin_row, origin_col, delta_x, delta_y):
     while True:
         cursor_row += delta_x
         cursor_col += delta_y
-        if (
-            cursor_row < 0 or
-            cursor_row >= row_count or
-            cursor_col < 0 or
-            cursor_col >= col_count
-        ): return True
+        if (check_past_edge(cursor_row, cursor_col)): return True
         cursor_value = cells[(cursor_row, cursor_col)]
         if cursor_value >= origin_value: return False
 
@@ -45,12 +48,7 @@ def check_direction2(origin_row, origin_col, delta_x, delta_y):
     while True:
         cursor_row += delta_x
         cursor_col += delta_y
-        if (
-            cursor_row < 0 or
-            cursor_row >= row_count or
-            cursor_col < 0 or
-            cursor_col >= col_count
-        ): break
+        if (check_past_edge(cursor_row, cursor_col)): break
         seen_count += 1
         cursor_value = cells[(cursor_row, cursor_col)]
         if cursor_value >= origin_value: break
@@ -64,14 +62,14 @@ for row_index, line in enumerate(open('input.txt', 'r').readlines()):
         col_count = max(col_count, col_index + 1)
 
 # Iterate through inner cells of the grid
-visible_count = get_perimeter_count()
+visible_from_edge_count = get_perimeter_count()
 scenic_scores = list()
 for row_index in range(1, row_count - 1):
     for col_index in range(1, col_count - 1):
         if check_visible_from_edge(row_index, col_index):
-            visible_count += 1
+            visible_from_edge_count += 1
         score = get_scenic_score(row_index, col_index) 
         scenic_scores.append(score)
 
-print("Step 1 Answer:", visible_count)
+print("Step 1 Answer:", visible_from_edge_count)
 print("Step 2 Answer:", max(scenic_scores))
