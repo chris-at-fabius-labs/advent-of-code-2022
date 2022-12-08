@@ -4,14 +4,11 @@ cells = dict()
 row_count = 0
 col_count = 0
 
-def get_perimeter_count():
-    return row_count * 2 + col_count * 2 - 4
-
 def check_past_edge(row_index, col_index):
     return (
         row_index < 0 or
-        row_index >= row_count or
         col_index < 0 or
+        row_index >= row_count or
         col_index >= col_count
     )
 
@@ -61,11 +58,11 @@ for row_index, line in enumerate(open('input.txt', 'r').readlines()):
         cells[(row_index, col_index)] = int(char)
         col_count = max(col_count, col_index + 1)
 
-# Iterate through inner cells of the grid
-visible_from_edge_count = get_perimeter_count()
+# Iterate through all cells of the grid
+visible_from_edge_count = 0
 scenic_scores = list()
-for row_index in range(1, row_count - 1):
-    for col_index in range(1, col_count - 1):
+for row_index in range(0, row_count):
+    for col_index in range(0, col_count):
         if check_visible_from_edge(row_index, col_index):
             visible_from_edge_count += 1
         score = get_scenic_score(row_index, col_index) 
