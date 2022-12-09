@@ -2,7 +2,7 @@
 
 import re
 
-line_pattern = re.compile(r"^([UDLR]) (\d+)$")
+move_pattern = re.compile(r"^([UDLR]) (\d+)$")
 
 VECTORS = {
     "U": (0, +1),
@@ -35,18 +35,17 @@ def reconcile_knot(leader, follower):
     if is_valid_knot_point(leader, follower): return follower
     for cardinal_vector in get_vectors(["U", "D", "L", "R"]):
         if leader == move_point(follower, cardinal_vector, 2):
-            return move_point(follower, cardinal_vector, 1)
+            return move_point(follower, cardinal_vector)
     for diagonal_vector in get_vectors(["UL", "UR", "DL", "DR"]):
-        check_point = move_point(follower, diagonal_vector, 1)
+        check_point = move_point(follower, diagonal_vector)
         if is_valid_knot_point(leader, check_point):
             return check_point
     raise Exception("Unable to reconcile knot", leader, follower)
 
-class State:
+class Rope:
     def __init__(self, knot_count):
-        self.knots = []
-        for i in range(knot_count): self.knots.append((0, 0))
-        self.tail_history = set([self.knots[-1]])
+        self.knots = [(0, 0) for i in range(knot_count)]
+        self.tail_history = set(self.knots)
     
     def move_head(self, vector, distance):
         for step in range(0, distance):
@@ -58,7 +57,7 @@ class State:
                 )
             self.tail_history.add(self.knots[-1])
     
-    def print_state(self):
+    def print(self):
         min_x, max_x, min_y, max_y = 0, 0, 0, 0
         for x, y in sum([self.knots, list(self.tail_history)], []):
             min_x = min(x, min_x)
@@ -80,19 +79,16 @@ class State:
             print("")
         print("")
 
-step_1 = State(2)
-step_2 = State(10)
+step_1 = Rope(knot_count = 2)
+step_2 = Rope(knot_count = 10)
 for line in open('input.txt', 'r').readlines():
-    line_match = line_pattern.match(line.rstrip("\n"))
-    if line_match:
-        # print(line_match.group(0))
-        vector = VECTORS.get(line_match.group(1))
-        distance = int(line_match.group(2))
-        step_1.move_head(vector, distance)
-        step_2.move_head(vector, distance)
-        # print_state()
+    move_match = move_pattern.match(line.rstrip("\n"))
+    vector = VECTORS.get(move_match.group(1))
+    distance = int(move_match.group(2))
+    step_1.move_head(vector, distance)
+    step_2.move_head(vector, distance)
 
 print("Step 1 Answer:", len(step_1.tail_history))
-step_1.print_state()
+# step_1.print()
 print("Step 2 Answer:", len(step_2.tail_history))
-step_2.print_state()
+# step_2.print()
