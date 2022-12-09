@@ -59,7 +59,7 @@ class Rope:
     
     def print(self):
         min_x, max_x, min_y, max_y = 0, 0, 0, 0
-        for x, y in sum([self.knots, list(self.tail_history)], []):
+        for x, y in [*self.knots, *self.tail_history]:
             min_x = min(x, min_x)
             max_x = max(x, max_x)
             min_y = min(y, min_y)
@@ -69,7 +69,7 @@ class Rope:
             for x in range(min_x, max_x + 1):
                 cell = "."
                 if (x, y) in self.tail_history: cell = "#"
-                if x == 0 and y == 0: cell = "s"
+                if (x, y) == (0, 0): cell = "s"
                 for knot_index, knot_point in enumerate(self.knots):
                     if (x, y) == knot_point:
                         if knot_index == 0: cell = "H"
