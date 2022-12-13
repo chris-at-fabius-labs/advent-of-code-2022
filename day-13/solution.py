@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import functools
+
 def find_close_bracket(s, i):
     next_close_index = s.find("]", i)
     if next_close_index == -1:
@@ -71,15 +73,28 @@ def compare(left, right):
     return compare(len(left), len(right))
 
 left_indexes = list()
+all_packets = list()
 for index, pair in enumerate(parse_file("input.txt"), start=1):
     left, right = pair
     print(f"Pair {index}\n{left}\n{right}")
     result = compare(left, right)
     print(f"Result: {result}\n")
     if result == -1: left_indexes.append(index)
+    all_packets.append(left)
+    all_packets.append(right)
 print("Step 1 Answer:", sum(left_indexes))
 
 divider_packets = list()
 for line in open("divider_packets.txt", "r").readlines():
     parsed = parse_list_element(line.rstrip("\n"))
     divider_packets.append(parsed)
+
+all_packets.extend(divider_packets)
+sorted_packets = sorted(all_packets, key=functools.cmp_to_key(compare))
+
+decoder_key = 1
+for p in divider_packets:
+    i = sorted_packets.index(p) + 1
+    print("Divider packet at index", i)
+    decoder_key *= i
+print("Step 2 Answer:", decoder_key)
