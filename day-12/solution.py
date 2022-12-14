@@ -43,16 +43,22 @@ def steps_len(steps):
 def steps_push(steps, coord):
     return (coord, steps)
 
+def steps_has(steps, coord):
+    for step in steps_iter(steps):
+        if step == coord: return True
+    return False
+
 def steps_print(steps):
     lookup = dict()
     last_coord, rest_coords = steps
-    lookup[last_coord] = "E"
-    for coord in steps_iter(rest_coords):
-        for d, v in VECTORS.items():
-            if last_coord == move_point(coord, v):
-                lookup[coord] = d
-                break
-        last_coord = coord
+    if last_coord:
+        lookup[last_coord] = "E"
+        for coord in steps_iter(rest_coords):
+            for d, v in VECTORS.items():
+                if last_coord == move_point(coord, v):
+                    lookup[coord] = d
+                    break
+            last_coord = coord
     for y in range(y_max + 1):
         for x in range(x_max + 1):
             cell = lookup.get((x, y), ".")
@@ -63,17 +69,16 @@ def steps_print(steps):
 def route_path(cursor, steps):
     if cursor == end_coord:
         count = steps_len(steps)
-        print("Found a suitable route in {count} steps!")
+        print(f"Found a suitable route in {count} steps!")
         yield (cursor, steps)
         return
     # print("Currently visiting", cursor)
     cursor_elevation = grid[cursor]
     # print("Current elevation:", cursor_elevation)
-    steps_set = set(steps_iter(steps))
     for direction, vector in VECTORS.items():
         # print(f"  Checking {direction}...")
         test_coord = move_point(cursor, vector)
-        if test_coord in steps_set:
+        if steps_has(steps, test_coord):
             # print("    Destination has already been visited")
             continue
         test_elevation = grid.get(test_coord)
@@ -89,6 +94,8 @@ def route_path(cursor, steps):
     yield (cursor, steps)
 
 def explore_routes(cursor, steps = (None, None)):
+    # print(f"Exploring routes from {cursor}:")
+    # steps_print(steps)
     winning_route, winning_len = None, None
     for next_cursor, next_steps in route_path(cursor, steps):
         if next_cursor == end_coord:
