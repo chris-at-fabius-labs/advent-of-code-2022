@@ -35,7 +35,6 @@ def split_list_inner(s):
             break
     return elements
 
-
 def parse_list_element(s):
     if len(s) >= 2 and s[0] == "[" and s[-1] == "]":
         elements = split_list_inner(s[1:-1])
@@ -58,7 +57,7 @@ def parse_file(input_file):
         yield (left_acc, right_acc)
 
 def compare(left, right):
-    print(f"Comparing {left} vs {right}")
+    # print(f"Comparing {left} vs {right}")
     if isinstance(left, int) and isinstance(right, int):
         if left > right: return 1
         if right > left: return -1
